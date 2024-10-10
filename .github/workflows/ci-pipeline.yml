@@ -70,7 +70,7 @@ jobs:
             SONAR_HOST_URL: ${{secrets.SONAR_URL}}
 
     build:
-      needs: test
+      needs: sonarqube
       permissions:
           id-token: write
       #contents: read
