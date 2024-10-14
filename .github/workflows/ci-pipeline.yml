@@ -186,7 +186,7 @@ jobs:
       - name: Download image-report
         uses: actions/download-artifact@v4
         with:
-          name: impage-report
+          name: image-report
           path: ${{github.workspace}}
       - name: Read reports
         run: |
