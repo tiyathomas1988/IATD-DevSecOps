@@ -150,7 +150,7 @@ jobs:
             path: report_json.json    
 
     image-scan:
-      needs: [test]
+      needs: test
       if: true
       runs-on: ubuntu-latest
       steps:
@@ -219,9 +219,9 @@ jobs:
 
 
     build:
-      if: False
+      if: false
       #needs: sonarqube
-      needs: [sonarqube, dast, image-scan]
+      needs: security_gate
       permissions:
           id-token: write
       #contents: read
