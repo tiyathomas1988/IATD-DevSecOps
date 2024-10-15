@@ -219,6 +219,7 @@ jobs:
 
 
     build:
+      if: False
       #needs: sonarqube
       needs: [sonarqube, dast, image-scan]
       permissions:
@@ -242,7 +243,7 @@ jobs:
             tags: ${{ secrets.DOCKERHUB_USERNAME }}/devops-labs:latest  
       
     submit_reports:
-      needs: [test, sonarqube, dast, build]
+      needs: [test, sonarqube, dast]
       if: true
       runs-on: ubuntu-latest
       steps:
