@@ -191,15 +191,15 @@ jobs:
       - name: Read reports
         run: |
           IMAGE_RESULT_HIGH=$(cat results.json | jq '.matches[] | select(.vulnerability.severity=="High") | .vulnerability.id' | wc -l)
-          if [ $IMAGE_RESULT_HIGH -gt 0]; then
+          if [ $IMAGE_RESULT_HIGH -gt 0 ]; then
             echo "Image scan has high severity vulnerabilities"
             exit 1
           else
-            echo " Image scan passed"
+            echo "Image scan passed"
           fi
 
           SONAR_RESULT=$(cat sonarqube-report.json | jq -r '.projectStatus.status')
-          if [ $SONAR_RESULT != "OK"]; then
+          if [ $SONAR_RESULT != "OK" ]; then
             echo "Sonar scan has issues"
             exit 1
           else
@@ -207,7 +207,7 @@ jobs:
           fi
 
           ZAP_RESULT_HIGH=$(cat report_json.json | jq -r '.site[].alerts[] | select(.riskdesc | startswith("High")) | .name' | wc -l)
-          if [ $ZAP_RESULT_HIGH -gt 0]; then
+          if [ $ZAP_RESULT_HIGH -gt 0 ]; then
             echo "Zap scan has high severity vulnerabilities"
             exit 1
           else
