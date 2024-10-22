@@ -220,12 +220,12 @@ jobs:
 
 
     build:
-      needs: []
+      needs: [security_gate]
       if: true
       #needs: sonarqube
       #needs: security_gate
-      #permissions:
-          # id-token: write
+      permissions:
+        id-token: write
       #contents: read
       runs-on: ubuntu-latest
       steps:
@@ -241,10 +241,21 @@ jobs:
         - name: Build and push Docker image
           uses: docker/build-push-action@v5
           with:
+            push: true
             sbom: true
             provenance: true     
-            push: true
-            tags: ${{ secrets.DOCKERHUB_USERNAME }}/devops-labs:latest  
+            #push: true
+            tags: ${{ secrets.DOCKERHUB_USERNAME }}/devops-labs:latest
+            
+        - name: Install Cosign
+          uses: sigstore/cosign-installer@v3.4.0
+
+        - name: Sign the images with Github OIDC Token
+          env: 
+            IMAGE: ${{ secrets.DOCKERHUB_USERNAME}}/devops-labs:latest
+          run: |
+            cosign sign --yes ${IMAGE}
+
       
     submit_reports:
       needs: [test, sonarqube, dast, image-scan]
@@ -280,6 +291,7 @@ jobs:
           env:
             DOCKERHUB_USERNAME: ${{secrets.DOCKERHUB_USERNAME}}
             AZURE_ACCESS_TOKEN: ${{steps.token-gen.outputs.azureAccessToken}}
+            IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/devops-labs
           run: |
            WEEK1_CONTAINER=$(curl -X POST -H "Authorization: Bearer $AZURE_ACCESS_TOKEN" -d "$DOCKERHUB_USERNAME/devops-labs" https://devsecops-ver.azurewebsites.net/api/week1-container)
            echo "Week1 container upload: $WEEK1_CONTAINER"
@@ -291,6 +303,8 @@ jobs:
            
            IMAGE_RESPONSE=$(curl -X POST -H "Authorization: Bearer $AZURE_ACCESS_TOKEN" --data-binary @$GITHUB_WORKSPACE/results.json https://devsecops-ver.azurewebsites.net/api/week4-image-report)
            echo "Image report upload: $IMAGE_RESPONSE"
+
+
 
             
 
